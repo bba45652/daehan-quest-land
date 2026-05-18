@@ -17,14 +17,23 @@ jobs:
         with:
           node-version: 18
 
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
       - name: Install EAS CLI
         run: npm install -g eas-cli
 
       - name: Install dependencies
         run: npm install
 
-      - name: Build APK with EAS
-        run: eas build --platform android --profile preview --non-interactive --output ./daehan-quest-land.apk
+      - name: Build APK (local)
+        run: eas build --platform android --profile preview --non-interactive --local --output ./daehan-quest-land.apk
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
