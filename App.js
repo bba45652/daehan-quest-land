@@ -4,10 +4,11 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import Svg, { Path, Circle, Rect } from 'react-native-svg';
 import { StatusBar } from 'expo-status-bar';
-import { GameProvider } from './src/context/GameContext';
+import { GameProvider, useGame } from './src/context/GameContext';
+import AuthScreen from './src/screens/AuthScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import QuestScreen from './src/screens/QuestScreen';
 import ShopScreen from './src/screens/ShopScreen';
@@ -108,27 +109,45 @@ function MainTabs() {
   );
 }
 
+function AppNavigator() {
+  const { session, loadingAuth } = useGame();
+
+  if (loadingAuth) {
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#EAF4FF' }}>
+        <ActivityIndicator size="large" color="#2E90FA" />
+      </View>
+    );
+  }
+
+  if (!session) return <AuthScreen />;
+
+  return (
+    <NavigationContainer>
+      <StatusBar style="dark" />
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Main"          component={MainTabs} />
+        <Stack.Screen name="Parent"        component={ParentScreen} />
+        <Stack.Screen
+          name="QuestComplete"
+          component={QuestCompleteScreen}
+          options={{ presentation: 'modal' }}
+        />
+        <Stack.Screen
+          name="LevelUp"
+          component={LevelUpScreen}
+          options={{ presentation: 'modal' }}
+        />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+
 export default function App() {
   return (
     <SafeAreaProvider>
       <GameProvider>
-        <NavigationContainer>
-          <StatusBar style="dark" />
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Main"          component={MainTabs} />
-            <Stack.Screen name="Parent"        component={ParentScreen} />
-            <Stack.Screen
-              name="QuestComplete"
-              component={QuestCompleteScreen}
-              options={{ presentation: 'modal' }}
-            />
-            <Stack.Screen
-              name="LevelUp"
-              component={LevelUpScreen}
-              options={{ presentation: 'modal' }}
-            />
-          </Stack.Navigator>
-        </NavigationContainer>
+        <AppNavigator />
       </GameProvider>
     </SafeAreaProvider>
   );
