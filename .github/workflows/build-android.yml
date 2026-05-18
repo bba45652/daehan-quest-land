@@ -32,6 +32,11 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Init EAS project
+        run: eas init --non-interactive
+        env:
+          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
       - name: Build APK (local)
         run: eas build --platform android --profile preview --non-interactive --local --output ./daehan-quest-land.apk
         env:
